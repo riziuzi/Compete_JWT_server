@@ -16,8 +16,10 @@ mongoose
     .connect(db)
     .then(() => console.log('MongoDB Connected'))
     .catch(err => console.log("err"));
-app.use(cors())
-app.use(express.json())     // to parse the incoming requset's JSON formatted string to JS object (accessed in the req.body)
+app.use(cors({
+    origin: 'http://localhost:3000',
+    credentials: true,
+})); app.use(express.json())     // to parse the incoming requset's JSON formatted string to JS object (accessed in the req.body)
 app.use(express.urlencoded({ extended: true }))    // same as above and something?
 app.use(passport.initialize());
 
