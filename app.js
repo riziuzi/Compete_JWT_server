@@ -8,6 +8,7 @@ const { User } = require("./database")
 const { hashSync, compareSync } = require('bcrypt');
 const jwt = require("jsonwebtoken")
 const passport = require("passport")
+// const cookieParser = require('cookie-parser');
 require("./passportConfig")
 
 // using middlewares
@@ -22,6 +23,8 @@ app.use(cors({
 })); app.use(express.json())     // to parse the incoming requset's JSON formatted string to JS object (accessed in the req.body)
 app.use(express.urlencoded({ extended: true }))    // same as above and something?
 app.use(passport.initialize());
+// app.use(cookieParser());        // for parsing cookie
+
 
 // GET
 app.get("/", (req, res) => {
@@ -35,6 +38,15 @@ app.get('/protected', passport.authenticate('jwt', { session: false }), (req, re
             username: req.user.username,
         }
     })
+})
+app.get("/logout",(req, res, next)=>{
+    req.logout(function(err) {
+        if (err) { return next(err); }
+        return res.status(200).send({
+            success : true,
+            message : "Logged out successfully!"
+        })
+      });
 })
 
 // POST
@@ -74,6 +86,7 @@ app.post("/login", async (req, res) => {
         id: user._id
     }
     const token = jwt.sign(payload, "Random string", { expiresIn: "1d" })
+    res.cookie('token', token, { httpOnly: true, maxAge: 24 * 60 * 60 * 1000 }); // TO set the token in the user's local browser
     return res.status(200).send({
         success: true,
         message: "Logged in successfully!",

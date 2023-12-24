@@ -4,7 +4,7 @@ const passport = require('passport')
 const {User} = require('./database')
 
 const opts = {}
-opts.jwtFromRequest = ExtractJwt.fromAuthHeaderAsBearerToken();
+opts.jwtFromRequest = ExtractJwt.fromAuthHeaderAsBearerToken()
 opts.secretOrKey = 'Random string';
 passport.use(new JwtStrategy(opts, async (jwt_payload, done) => {
     try {
