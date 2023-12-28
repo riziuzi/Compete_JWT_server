@@ -12,7 +12,7 @@ const passport = require("passport")
 require("./passportConfig")
 
 // using middlewares
-db = "mongodb+srv://riziuzi:8rkI2Ecz3vsXuXw6@userscluster.ogfwcvn.mongodb.net/?retryWrites=true&w=majority"
+db = "mongodb+srv://riziuzi:Ya1y1fCgI8Z5Wj0s@authenticationscluster.dcaj1z9.mongodb.net/?retryWrites=true&w=majority"
 mongoose
     .connect(db)
     .then(() => console.log('MongoDB Connected'))
@@ -34,29 +34,29 @@ app.get('/protected', passport.authenticate('jwt', { session: false }), (req, re
     return res.status(200).send({
         success: true,
         user: {
-            id: req.user._id,
-            username: req.user.username,
+            _id: req.user._id,
+            userId: req.user.userId,
         }
     })
 })
-app.get("/logout",(req, res, next)=>{
-    req.logout(function(err) {
-        if (err) { return next(err); }
-        return res.status(200).send({
-            success : true,
-            message : "Logged out successfully!"
-        })
-      });
-})
+// app.get("/logout",(req, res, next)=>{
+//     req.logout(function(err) {
+//         if (err) { return next(err); }
+//         return res.status(200).send({
+//             success : true,
+//             message : "Logged out successfully!"
+//         })
+//       });
+// })
 
 // POST
 app.post("/register", async (req, res) => {
-    const { username, name, password } = req.body
-    const user = await User.findOne({ username: username })               // await is necessary, as this line is skipped and the next if statement becomes true hueueueueue
+    const { userId, name, password } = req.body
+    const user = await User.findOne({ userId: userId })               // await is necessary, as this line is skipped and the next if statement becomes true hueueueueue
     if (user) return res.status(400).send({ message: "user already exists" })
     const newUser = new User({
         name: name,
-        username: username,
+        userId: userId,
         password: hashSync(password, 10)
     })
     newUser.save().then((user) => {
@@ -65,14 +65,14 @@ app.post("/register", async (req, res) => {
             message: "User Registered",
             user: {
                 _id: user._id,
-                username: user.username
+                userId: user.userId
             }
         })
     })
 })
 app.post("/login", async (req, res) => {
-    const { username, password } = req.body
-    const user = await User.findOne({ username: username })
+    const { userId, password } = req.body
+    const user = await User.findOne({ userId: userId })
     if (!user) return res.status(401).send({
         success: false,
         message: "NO user FOUND!!!!"
@@ -82,7 +82,7 @@ app.post("/login", async (req, res) => {
         message: "Incorrect Password"
     })
     const payload = {
-        username: user.username,
+        userId: user.userId,
         id: user._id
     }
     const token = jwt.sign(payload, "Random string", { expiresIn: "1d" })
