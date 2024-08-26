@@ -95,4 +95,6 @@ app.post("/login", async (req, res) => {
 })
 
 // Listening
-app.listen(3001, console.log("Started Listening and localhost:3001"))
+app.listen(3001, '0.0.0.0', () => {
+    console.log("Server is running on port 3001");
+});
